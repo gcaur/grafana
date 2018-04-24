@@ -100,7 +100,7 @@ jobs:
       - checkout
       - run:
           name: build and package grafana
-          command: './scripts/build/build.sh'
+          command: './scripts/build/build_enterprise.sh'
       - run:
           name: sign packages
           command: './scripts/build/sign_packages.sh'
