@@ -20,6 +20,7 @@ cd extensions
 
 cd ../grafana
 
+go test -v ./pkg/extensions/...
 
 if [ "$CIRCLE_TAG" != "" ]; then
   echo "Building a release from tag $ls"

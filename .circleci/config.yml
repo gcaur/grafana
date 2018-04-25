@@ -99,9 +99,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: test backend
-          command: 'go test -v ./pkg/extensions/...'
-      - run:
           name: build and package grafana
           command: './scripts/build/build_enterprise.sh'
       - run:
