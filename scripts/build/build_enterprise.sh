@@ -20,7 +20,19 @@ cd extensions
 
 cd ../grafana
 
-go test -v ./pkg/extensions/...
+function exit_if_fail {
+    command=$@
+    echo "Executing '$command'"
+    eval $command
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "'$command' returned $rc."
+        exit $rc
+    fi
+}
+
+exit_if_fail test -z "$(go test ./pkg/extensions/... | tee /dev/stderr)"
+
 
 if [ "$CIRCLE_TAG" != "" ]; then
   echo "Building a release from tag $ls"
