@@ -14,6 +14,7 @@ import (
 
 	"github.com/facebookgo/inject"
 	"github.com/grafana/grafana/pkg/bus"
+	"github.com/grafana/grafana/pkg/middleware"
 	"github.com/grafana/grafana/pkg/registry"
 	"github.com/grafana/grafana/pkg/services/dashboards"
 	"github.com/grafana/grafana/pkg/services/provisioning"
@@ -56,8 +57,9 @@ type GrafanaServerImpl struct {
 	shutdownFn    context.CancelFunc
 	childRoutines *errgroup.Group
 	log           log.Logger
+	RouteRegister api.RouteRegister `inject:""`
 
-	httpServer *api.HTTPServer
+	HttpServer *api.HTTPServer `inject:""`
 }
 
 func (g *GrafanaServerImpl) Start() error {
@@ -95,12 +97,16 @@ func (g *GrafanaServerImpl) Start() error {
 	serviceGraph := inject.Graph{}
 	serviceGraph.Provide(&inject.Object{Value: bus.GetBus()})
 	serviceGraph.Provide(&inject.Object{Value: dashboards.NewProvisioningService()})
+	serviceGraph.Provide(&inject.Object{Value: api.NewRouteRegister(middleware.RequestMetrics, middleware.RequestTracing)})
+	serviceGraph.Provide(&inject.Object{Value: api.HTTPServer{}})
 	services := registry.GetServices()
 
 	// Add all services to dependency graph
 	for _, service := range services {
 		serviceGraph.Provide(&inject.Object{Value: service})
 	}
+
+	serviceGraph.Provide(&inject.Object{Value: g})
 
 	// Inject dependencies to services
 	if err := serviceGraph.Populate(); err != nil {
@@ -113,7 +119,7 @@ func (g *GrafanaServerImpl) Start() error {
 			continue
 		}
 
-		g.log.Info(fmt.Sprintf("Initializing %s", reflect.TypeOf(service).Elem().Name()))
+		g.log.Info("Initializing " + reflect.TypeOf(service).Elem().Name())
 
 		if err := service.Init(); err != nil {
 			return fmt.Errorf("Service init failed %v", err)
@@ -133,7 +139,7 @@ func (g *GrafanaServerImpl) Start() error {
 
 		g.childRoutines.Go(func() error {
 			err := service.Run(g.context)
-			g.log.Info(fmt.Sprintf("Stopped %s", reflect.TypeOf(service).Elem().Name()), "reason", err)
+			g.log.Info("Stopped "+reflect.TypeOf(service).Elem().Name(), "reason", err)
 			return err
 		})
 	}
@@ -159,9 +165,11 @@ func (g *GrafanaServerImpl) initLogging() {
 }
 
 func (g *GrafanaServerImpl) startHttpServer() error {
-	g.httpServer = api.NewHTTPServer()
+	//g.HttpServer = api.NewHTTPServer()
+	//g.HttpServer = &api.HTTPServer{}
+	g.HttpServer.Init()
 
-	err := g.httpServer.Start(g.context)
+	err := g.HttpServer.Start(g.context)
 
 	if err != nil {
 		return fmt.Errorf("Fail to start server. error: %v", err)
@@ -173,7 +181,7 @@ func (g *GrafanaServerImpl) startHttpServer() error {
 func (g *GrafanaServerImpl) Shutdown(code int, reason string) {
 	g.log.Info("Shutdown started", "code", code, "reason", reason)
 
-	err := g.httpServer.Shutdown(g.context)
+	err := g.HttpServer.Shutdown(g.context)
 	if err != nil {
 		g.log.Error("Failed to shutdown server", "error", err)
 	}
