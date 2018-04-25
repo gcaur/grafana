@@ -19,6 +19,7 @@ type HelloService struct {
 }
 
 func (s *HelloService) Init() error {
+	s.log = log.New("helloservice")
 	return nil
 }
 

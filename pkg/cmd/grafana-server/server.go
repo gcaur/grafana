@@ -12,10 +12,10 @@ import (
 	"strconv"
 	"time"
 
-	//"github.com/grafana/grafana/pkg/services/dashboards"
 	"github.com/facebookgo/inject"
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/registry"
+	"github.com/grafana/grafana/pkg/services/dashboards"
 	"github.com/grafana/grafana/pkg/services/provisioning"
 
 	"golang.org/x/sync/errgroup"
@@ -32,6 +32,7 @@ import (
 	"github.com/grafana/grafana/pkg/social"
 	"github.com/grafana/grafana/pkg/tracing"
 
+	_ "github.com/grafana/grafana/pkg/extensions"
 	_ "github.com/grafana/grafana/pkg/services/alerting"
 	_ "github.com/grafana/grafana/pkg/services/cleanup"
 	_ "github.com/grafana/grafana/pkg/services/hello"
@@ -93,6 +94,7 @@ func (g *GrafanaServerImpl) Start() error {
 
 	serviceGraph := inject.Graph{}
 	serviceGraph.Provide(&inject.Object{Value: bus.GetBus()})
+	serviceGraph.Provide(&inject.Object{Value: dashboards.NewProvisioningService()})
 	services := registry.GetServices()
 
 	// Add all services to dependency graph
