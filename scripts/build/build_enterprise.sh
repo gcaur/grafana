@@ -31,7 +31,7 @@ function exit_if_fail {
     fi
 }
 
-exit_if_fail test -z "$(go test ./pkg/extensions/... | tee /dev/stderr)"
+exit_if_fail go test ./pkg/extensions/...
 
 
 if [ "$CIRCLE_TAG" != "" ]; then
