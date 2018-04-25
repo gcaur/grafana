@@ -165,8 +165,6 @@ func (g *GrafanaServerImpl) initLogging() {
 }
 
 func (g *GrafanaServerImpl) startHttpServer() error {
-	//g.HttpServer = api.NewHTTPServer()
-	//g.HttpServer = &api.HTTPServer{}
 	g.HttpServer.Init()
 
 	err := g.HttpServer.Start(g.context)

@@ -33,8 +33,8 @@ func (s *HelloService) GetHello(c *models.ReqContext) {
 }
 
 func (s *HelloService) Run(ctx context.Context) error {
-
 	ticker := time.NewTicker(time.Minute * 10)
+	defer ticker.Stop()
 
 	for {
 		select {
