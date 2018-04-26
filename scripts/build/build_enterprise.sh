@@ -16,7 +16,7 @@ echo "current dir: $(pwd)"
 cd ..
 #git clone git@github.com:bergquist/grafana-extensions.git extensions
 git clone -b ee_build --single-branch git@github.com:grafana/grafana-enterprise.git --depth 1
-cd extensions
+cd grafana-enterprise
 ./build.sh
 
 cd ../grafana
