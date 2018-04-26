@@ -14,8 +14,8 @@ cd /go/src/github.com/grafana/grafana
 echo "current dir: $(pwd)"
 
 cd ..
-#git clone git@github.com:bergquist/grafana-extensions.git extensions
-git clone -b ee_build --single-branch git@github.com:grafana/grafana-enterprise.git --depth 1
+git clone -b ee_build --single-branch git@github.com:grafana/grafana-enterprise.git --depth 10
+git checkout fc1a9609c7f97d376d8d10894fd3d83668b856e0
 cd grafana-enterprise
 ./build.sh
 
