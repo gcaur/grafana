@@ -36,10 +36,10 @@ exit_if_fail go test ./pkg/extensions/...
 
 if [ "$CIRCLE_TAG" != "" ]; then
   echo "Building a release from tag $ls"
-  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterpriseBuild=true -includeBuildNumber=false build
+  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterprise=true -includeBuildNumber=false build
 else
   echo "Building incremental build for $CIRCLE_BRANCH"
-  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterpriseBuild=true build
+  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterprise=true build
 fi
 
 yarn install --pure-lockfile --no-progress
@@ -50,8 +50,8 @@ echo "current dir: $(pwd)"
 
 if [ "$CIRCLE_TAG" != "" ]; then
   echo "Packaging a release from tag $CIRCLE_TAG"
-  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterpriseBuild=true -includeBuildNumber=false package latest
+  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterprise=true -includeBuildNumber=false package latest
 else
   echo "Packaging incremental build for $CIRCLE_BRANCH"
-  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterpriseBuild=true package latest
+  go run build.go -buildNumber=${CIRCLE_BUILD_NUM} -enterprise=true package latest
 fi
