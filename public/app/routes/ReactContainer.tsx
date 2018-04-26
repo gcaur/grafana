@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'mobx-react';
+
 import coreModule from 'app/core/core_module';
 import { store } from 'app/stores/store';
-import { Provider } from 'mobx-react';
+import { BackendSrv } from 'app/core/services/backend_srv';
+import { DatasourceSrv } from 'app/features/plugins/datasource_srv';
 
 function WrapInProvider(store, Component, props) {
   return (
@@ -13,7 +16,7 @@ function WrapInProvider(store, Component, props) {
 }
 
 /** @ngInject */
-export function reactContainer($route, $location, backendSrv) {
+export function reactContainer($route, $location, backendSrv: BackendSrv, datasourceSrv: DatasourceSrv) {
   return {
     restrict: 'E',
     template: '',
@@ -21,6 +24,7 @@ export function reactContainer($route, $location, backendSrv) {
       let component = $route.current.locals.component;
       let props = {
         backendSrv: backendSrv,
+        datasourceSrv: datasourceSrv,
       };
 
       ReactDOM.render(WrapInProvider(store, component, props), elem[0]);
